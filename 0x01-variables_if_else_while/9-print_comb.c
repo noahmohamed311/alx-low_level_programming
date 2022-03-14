@@ -8,11 +8,17 @@
  */
 int main(void)
 {
-int abc;
-for (abc = 'a'; abc <= 'z'; abc++)
-	if ((abc != 'q') && (abc != 'e'))
+int n;
+n = '0';
+while (n <= '9')
 {
-	putchar (abc);
+putchar(n);
+if (n != '9')
+{
+putchar (',');
+putchar (' ');
+}
+n++;
 }
 putchar ('\n');
 return (0);
