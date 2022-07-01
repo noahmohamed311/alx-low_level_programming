@@ -1,57 +1,55 @@
 #include "hash_tables.h"
+
 /**
-* hash_table_set - function
-* @ht: table to add/update key/value to
-* @key: key. Cannot be empty string
-* @value: value associated with key
-*
-* Description: function to add an element to a hash table.
-* Return: 1 Success, 0 Fail
-*/
+ * hash_table_set - Adds an element to the hash table
+ *
+ * @ht: The hash table you want to add or update the key/value to
+ * @key: The key to add. Cannot be an empty string
+ * @value: The value associated with the key. Must be a duplicate. Can be an
+ * empty string
+ *
+ * Return: 1 if success, 0 if failure
+ */
+
 int hash_table_set(hash_table_t *ht, const char *key, const char *value)
 {
-	hash_node_t *newNode, *tempNode;
-	unsigned long int index;
+	hash_node_t *ptr;
+	hash_node_t *new_node;
+	unsigned long int idx;
 
-	if (ht == NULL)
+	if (ht == NULL || key == NULL)
 		return (0);
-	index = (hash_djb2((const unsigned char *)key) % (ht->size));
-	if (key == NULL || value == NULL || (strcmp(key, "") == 0))
-		return (0);
-	if (ht->array[index] == NULL) /*slot is empty, put node here*/
-	{newNode = malloc(sizeof(hash_node_t));
-		if (newNode == NULL)
-			return (0);
-		ht->array[index] = newNode;
-		newNode->key = (strdup(key));
-		newNode->value = (strdup(value));
-		newNode->next = NULL;
-		return (1);
-	}
-	tempNode = ht->array[index];
-	while (tempNode) /*while "head" is not NULL*/
+	idx = key_index((unsigned char *)key, ht->size);
+	ptr = ht->array[idx];
+	while (ptr != NULL)
 	{
-		if (strcmp(key, tempNode->key) == 0)
-		{free(tempNode->value);
-			tempNode->value = (strdup(value));
+		if (strcmp(ptr->key, key) == 0)
+		{
+			free(ptr->value);
+			ptr->value = strdup(value);
+			if (ptr->value == NULL)
+				return (0);
 			return (1);
 		}
-		tempNode = tempNode->next;/*traversing*/
+		ptr = ptr->next;
 	}
-	tempNode = ht->array[index];
-	while (tempNode)
-	{newNode = malloc(sizeof(hash_node_t));
-		if (newNode == NULL)
-			return (0);
-		ht->array[index] = newNode;
-		newNode->key = (strdup(key));
-		newNode->value = (strdup(value));
-		newNode->next = tempNode, ht->array[index] = newNode;
-		return (1);
+	new_node = malloc(sizeof(hash_node_t));
+	if (new_node == NULL)
+		return (0);
+	new_node->key = strdup(key);
+	if (new_node->key == NULL)
+	{
+		free(new_node);
+		return (0);
 	}
-	return (0);
+	new_node->value = strdup(value);
+	if (new_node->value == NULL)
+	{
+		free(new_node->key);
+		free(new_node);
+		return (0);
+	}
+	new_node->next = ht->array[idx];
+	ht->array[idx] = new_node;
+	return (1);
 }
-Footer
-© 2022 GitHub, Inc.
-Footer navigation
-Terms
